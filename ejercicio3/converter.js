@@ -6,11 +6,47 @@ class Currency {
 }
 
 class CurrencyConverter {
-    constructor() {}
+    constructor(apiUrl) {
+        this.apiUrl = apiUrl;
+        this.currencies = [];
+    }
 
-    getCurrencies(apiUrl) {}
+    async getCurrencies() {
+        return fetch(`${this.apiUrl}/currencies`)
+            .then(response => response.json())
+            .then(data => {
+                this.currencies = Object.keys(data).map(code => new Currency(code, data[code]));
+            })
+            .catch(error => {
+                console.error('Error al recuperar monedas:', error);
+            });
+    }
 
-    convertCurrency(amount, fromCurrency, toCurrency) {}
+    async convertCurrency(amount, fromCurrency, toCurrency) {
+        return new Promise((resolve, reject) => {
+            if (fromCurrency.code === toCurrency.code) {
+                resolve(amount);
+            } else {
+                fetch(`${this.apiUrl}/latest?amount=${amount}&from=${fromCurrency.code}&to=${toCurrency.code}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Error al obtener la tasa de conversión');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (!data.rates || !data.rates[toCurrency.code]) {
+                            throw new Error('Tasa de conversión no encontrada');
+                        }
+                        resolve(data.rates[toCurrency.code]);
+                    })
+                    .catch(error => {
+                        console.error('Error al convertir moneda:', error);
+                        reject('Error al realizar la conversión.');
+                    });
+            }
+        });
+    }
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
