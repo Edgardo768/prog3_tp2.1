@@ -1,6 +1,77 @@
-class Customer {}
+class Customer {
+    #id;
+    #name;
+    #email;
 
-class Reservation {}
+  constructor(id, name, email) {
+    this.#id = id;
+    this.#name = name;
+    this.#email = email;
+  }
+
+  get id() {
+    return this.#id;
+  }
+
+  get name() {
+    return this.#name;
+  }
+
+  get email() {
+    return this.#email;
+  }
+
+  get info() {
+    return `${this.#name} (${this.#email})`;
+  }
+}
+
+class Reservation {
+    #id;
+    #customer;
+    #date;
+    #guests;
+
+  constructor(id, customer, date, guests) {
+    this.#id = id;
+    this.#customer = customer;
+    this.#date = new Date(date);
+    this.#guests = guests;
+  }
+
+  get id() {
+    return this.#id;
+  }
+
+  get customer() {
+    return this.#customer;
+  }
+
+  get date() {
+    return this.#date;
+  }
+
+  get guests() {
+    return this.#guests;
+  }
+
+  get info() {
+    return `Reservacion para ${this.#customer.info} en dia ${this.#date.toLocaleString()} para ${this.#guests} personas.`;
+  }
+
+  static validateReservation(reservationDate, guests) {
+    const currentDate = new Date();
+
+    if (guests <= 0) {
+       return false;
+        
+    }
+    if (reservationDate < currentDate) {
+       return false;
+    }
+    return true;
+    }
+}
 
 class Restaurant {
     constructor(name) {
